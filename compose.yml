@@ -2,7 +2,7 @@ services:
   webhook2mqtt:
     container_name: webhook2mqtt
     build:
-      context: ./webhook2mqtt
+      context: .
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
