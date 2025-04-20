@@ -1,0 +1,10 @@
+services:
+  webhook2mqtt:
+    container_name: webhook2mqtt
+    build:
+      context: ./webhook2mqtt
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      MQTT_HOST: "172.17.0.1"
