@@ -18,8 +18,16 @@ def catch_all(path=""):
 
         host = os.getenv("MQTT_HOST", "localhost")
         port = int(os.getenv("MQTT_PORT", 1883))
+        username = os.getenv("MQTT_USERNAME", None)
+        password = os.getenv("MQTT_PASSWORD", None)
 
-        with MQTTWrapper(host=host, port=port, client_id="webhook2mqtt") as mqtt:
+        with MQTTWrapper(
+            host=host,
+            port=port,
+            client_id="webhook2mqtt",
+            username=username,
+            password=password,
+        ) as mqtt:
             mqtt.client.publish(path, payload=request.data)
         return "ok"
 

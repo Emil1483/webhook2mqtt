@@ -1,5 +1,4 @@
 from datetime import datetime
-import threading
 from typing import Any, Callable
 import paho.mqtt.client as mqtt
 from paho.mqtt.client import CallbackAPIVersion, Client, MQTTMessage
@@ -20,12 +19,25 @@ class MQTTConnected(Exception):
 
 
 class MQTTWrapper:
-    def __init__(self, host: str, port=1883, keepalive=60, client_id: str = None):
+    def __init__(
+        self,
+        host: str,
+        port=1883,
+        keepalive=60,
+        client_id: str = None,
+        username: str = None,
+        password: str = None,
+    ):
         self.client = mqtt.Client(
             CallbackAPIVersion.VERSION2,
             protocol=mqtt.MQTTv311,
             client_id=client_id,
         )
+
+        if username and password:
+            self.client.username_pw_set(username, password)
+        elif username or password:
+            raise ValueError("Both username and password must be provided or neither.")
 
         self.host = host
         self.port = port
@@ -88,10 +100,14 @@ class MQTTWrapper:
             raise MQTTConnectionFailedError()
 
         def on_disconnect(_, *args):
-            logging.warning(f"Disconnected from MQTT broker at {self.host}:{self.port}")
 
             if not self.disconnecting_flag:
+                logging.error(
+                    f"Disconnected from MQTT broker at {self.host}:{self.port}"
+                )
                 raise MQTTDisconnectedError(*args)
+
+            logging.info(f"Disconnected from MQTT broker at {self.host}:{self.port}")
 
         self.client.on_connect = on_connect
         self.client.on_connect_fail = on_connect_fail
